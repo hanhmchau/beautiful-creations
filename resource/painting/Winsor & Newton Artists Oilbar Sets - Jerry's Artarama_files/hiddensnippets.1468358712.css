@@ -1,0 +1,18 @@
+/**
+ * @package     BlueAcorn\RichSnippets
+ * @version
+ * @author      Blue Acorn, Inc. <code@blueacorn.com>
+ * @copyright   Copyright © 2014 Blue Acorn, Inc.
+ */
+
+ #snippetContainer {
+    overflow: hidden;
+    position: relative;
+}
+.richsnippets {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    right: -50px;
+    top: 50px;
+}

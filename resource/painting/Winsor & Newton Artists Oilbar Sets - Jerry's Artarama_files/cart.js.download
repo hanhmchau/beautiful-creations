@@ -1,0 +1,601 @@
+/*cart app starts*/
+function ajaxCheckoutCart($,options)
+{	
+	this.options={
+			'deleteButton':".btn-remove",
+			'emptyButton':".btn-empty-cart",
+			'updateButton':".btn-update",
+			'couponButton':".discount-form button.teal-button,.discount-form .cancel-coupon",
+			'giftcardButton':"#giftcard-form button.teal-button,#giftcard-form .cancel-coupon",
+			'cartContainer':"#shopping-cart-table",
+			'totalContainer':".cart-totals",
+			'msgContainer':"ul.messages",
+			'msgTemplate':"<ul class='messages'>$1</ul>",
+			"debug":1
+			     };
+    this.options=$.extend(this.options,options);
+	this.init();
+}
+
+ajaxCheckoutCart.prototype={
+
+	  init:function(){
+	  	
+	  	var self = this;
+	  	var options=self.options;
+	  	self.prepareElements();
+	  	this.log(options.couponButton);
+	  	$(document).on("click","button[id*=sku-submit-button_]", self.addItem.bind(self));
+        $(document).on("click",options.deleteButton, self.deleteItem.bind(self));
+        $(document).on("click",options.updateButton, self.updateItem.bind(self));
+        $(document).on("click",options.emptyButton, self.emptyCart.bind(self));
+        $(document).on("click",options.couponButton, self.applyCoupon.bind(self));
+        $(document).on("click",options.giftcardButton, self.applyGiftcard.bind(self));
+	  },
+
+	  deleteItem:function(e)
+	  {		e.preventDefault();
+	  		var self = this;
+	  		var options=self.options;
+	  		//var url=options.host
+	  		var element=$(e.target);
+	  		var url=element.href;
+	  			if(url.indexOf("giftcard/cart/remove")!=-1)
+	  			{
+	  				url=url.replace("giftcard/cart/remove","checkout/cart/deleteGiftcardAjax")+"?ajax=1";
+	  			}
+	  			else
+	  			{
+	  				url=url.replace("cart/delete","cart/deleteAjax")+"?ajax=1";
+	  			}
+	  		jQuery.ajax({
+	  			url:url,
+	  			dataType:'json',
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  				 if(data['error'])
+	  				 {
+	  				 	self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  
+	  },
+	  addItem:function(e)
+	  {		e.preventDefault();
+	  		if(jQuery("#skuPut").val().trim().length==0)
+	  		{
+	  			alert("Please enter #item number");
+	  			return;
+	  		}
+	  		var qty=jQuery(".block-addbysku input.input-text.qty").val();
+	  		var self = this;
+	  		var options=self.options;
+	  		//var url=options.host
+	  		var element=$(e.target);
+	  		var url="/checkout/cart/addAjax/form_key/"+jQuery("input[name='form_key']").val();
+	  			url=url+"/?ajax=1";
+	  		 jQuery.ajax({
+	  			url:url,
+	  			dataType:'json',
+	  			data:{item_number:jQuery("#skuPut").val().trim(),qty:qty},
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  				 if(data['error'])
+	  				 {
+	  				 	self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  
+	  },
+	  updateItem:function(e)
+	  {
+	  		e.preventDefault();
+	  		var self = this;
+	  		var options=self.options;
+	  		//var url=options.host
+	  		var element=jQuery(e.target);
+	  		var form=element.closest('form');
+	  		var url=form.attr("action");
+	  			url=url.replace("cart/updatePost","cart/updatePostAjax")+"?ajax=1";
+
+	  		    jQuery.ajax({
+	  			type:'GET',
+	  			url:url,
+	  			data:form.serialize(),
+	  			dataType:'json',
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  				 if(data['error'])
+	  				 {
+	  				 	self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  },
+	  emptyCart:function(e)
+	  {
+	  	   e.preventDefault();
+	  		var self = this;
+	  		var options=self.options;
+	  		var element=jQuery(e.target);
+	  		var form=element.closest('form');
+	  		var url="/checkout/cart/emptyCartAjax/form_key/"+jQuery("input[name='form_key']").val();
+	  			url=url+"/?ajax=1";
+
+	  		    jQuery.ajax({
+	  			type:'GET',
+	  			url:url,
+	  			data:form.serialize(),
+	  			dataType:'json',
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  				 if(data['error'])
+	  				 {
+	  				 	self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  },
+	  applyCoupon:function(e)
+	  {
+	  		e.preventDefault();
+	  		var self = this;
+	  		var options=self.options;
+	  		
+	  		var element=jQuery(e.target);
+	  		var form=element.closest('form');
+	  		var url=form.attr("action");
+	  		    url=url.replace("cart/couponPost","cart/couponPostAjax")+"?ajax=1";
+
+		  	if(element.val()=='Apply')
+		  	{			jQuery("#remove-coupone").val("0");
+		  		var val=jQuery('#coupon_code').addClass("required-entry");
+		  	}
+		  	
+		  	if(element.val()=='Cancel')
+		  	{	jQuery("#remove-coupone").val("1");
+		  		var val=jQuery('#coupon_code').removeClass("required-entry");
+		  	}
+
+		  	if(discountForm.validator.validate())
+		  	 {
+	  		    jQuery.ajax({
+	  			type:'POST',
+	  			url:url,
+	  			data:form.serialize(),
+	  			dataType:'json',
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+						if(element.val()=='Cancel')
+						{
+						   jQuery("tr.row-discount").addClass("no-display");
+						}
+	  				 }
+	  				 if(data['error'])
+	  				 {	self.setContent(data);
+						var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  	   }
+	  },
+	  applyGiftcard:function(e)
+	  {
+	  		e.preventDefault();
+	  		var self = this;
+	  		var options=self.options;
+	  		
+	  		var element=jQuery(e.target);
+	  		var form=element.closest('form');
+	  		var url=form.attr("action");
+	  		    url=url.replace("giftcard/cart/add","checkout/cart/giftcardPostAjax")+"?ajax=1";
+
+		  	if(element.val()=='Apply')
+		  	{			//jQuery("#remove-coupone").val("0");
+		  		var val=jQuery('#giftcard_code').addClass("required-entry");
+		  	}
+		  	
+		  	/*if(element.val()=='Cancel')
+		  	{	//jQuery("#remove-coupone").val("1");
+		  		var val=jQuery('#giftcard_code').removeClass("required-entry");
+		  	}*/
+
+		  	if(giftcardForm.validator.validate())
+		  	 {
+	  		    jQuery.ajax({
+	  			type:'POST',
+	  			url:url,
+	  			data:form.serialize(),
+	  			dataType:'json',
+	  			beforeSend:function()
+	  			{
+	  				self.showLoader();
+	  				jQuery(self.options.msgContainer).remove();
+	  			},
+	  			success:function(data)
+	  			{
+	  				 if(data['success'])
+	  				 {
+	  				 	self.setContent(data);
+	  				 	var qty=new qtyHandler();
+	  				 	self.showMessages(data);
+	  				 }
+	  				 if(data['error'])
+	  				 {
+	  				    self.showMessages(data);
+	  				 }
+	  			},
+	  			error:function(data)
+	  			{
+
+	  			},
+	  			complete:function()
+	  			{
+	  				self.hideLoader();
+	  				self.scrollTo();
+	  			}
+	  		});
+	  	   }
+	  },
+	  showLoader:function()
+	  { 
+	  	var tpl='<span class="isloading-wrapper %wrapper%"><img src="/skin/frontend/blueacorn/jerrys/images/small_loading.gif"/><span class="adding-to-cart">Please wait...</span></span>' ;
+	  	jQuery.isLoading({ text: "Please wait", position: "overlay", 'tpl': tpl });
+	  }
+	  ,
+	  hideLoader:function()
+	  {
+	  	jQuery.isLoading("hide");
+	  },
+	  setContent:function(data)
+	  {	 this.log("Log for set content => "+data);
+	  	 if(data['cart'])
+	  	 {
+	  	   jQuery('.col-main').html(data['cart']);
+		   this.getCartTotals();
+	  	   this.rebindPopup();
+	  	   this.rebindQuickView();
+	  	   jQuery("#discount-coupon-form .discount h2").on("click",function(){
+	  	   		jQuery(this).closest("form").toggleClass("cart-form-active");
+	  	   });
+	  	   jQuery("div.giftcard h2").on("click",function(){
+	  	   jQuery(this).parent().toggleClass("cart-form-active");
+	  	   });
+	  	 }
+	  	 
+	  	 /*if(data['minicart_html'])
+	  	 {
+	  	 	jQuery('.header-minicart').html(data['minicart_html']);
+		  	this.rebindMinicart();
+	  	 }*/
+	  	 this.getMiniCart();
+	  	 this.prepareElements();
+	  },
+	  showMessages:function(data)
+	  { 
+	  	var html='';
+
+	  	if(data['success_messages'])
+	  	{ 
+	  		html+='<li class="success-msg">'+this.prepareMsgItems(data['success_messages'])+'</li>';	
+	  	}
+	  	if(data['error_messages'])
+	  	{ 
+	  		html+='<li class="error-msg">'+this.prepareMsgItems(data['error_messages'])+'</li>';	
+	  	}
+
+	  	if(html!='')
+	  	{	 
+	  		 if(jQuery(this.options.msgContainer).length>0)
+	  		 {  this.log(this.options.msgContainer);
+	  		 	jQuery(this.options.msgContainer).html(html);
+	  		 }
+	  		 else
+	  		 {	var container=this.options.msgTemplate.replace("$1",html);
+	  			
+	  		 	jQuery(container).insertAfter(jQuery(".page-title"));
+	  		 }
+	  	}
+	  }
+	  ,
+	  showErrorMessage:function(data)
+	  {
+	  	
+	  }
+	  ,
+	  prepareMsgItems:function(msgs)
+	  {		
+	  		var html='<ul>';
+	  		
+	  		if(typeof(msgs)=='object')
+	  		{ 	
+	  			msgs.each(function(v,i)
+	  			{
+	  		  		html+='<li><span>'+v+'</span></li>';
+	  			})
+	  		}
+	  		else
+	  		{
+	  			html+='<li><span>'+msgs+'</span></li>';
+	  		}
+
+	  		html+='</ul>';
+	  		return html;
+	  },
+	  rebindMinicart: function() {
+
+        var skipContents = jQuery('.skip-content');
+        var skipLinks = jQuery('.skip-link').not('.skip-nav');
+
+        jQuery(document).on('mousedown', function(){
+            jQuery('#header-cart').removeAttr('style');
+        });
+
+        jQuery(document).on('click', '.skip-link', function (e) {
+
+            e.preventDefault();
+
+            var self = jQuery(this);
+            var target = self.attr('href');
+
+            // Get target element
+            var elem = jQuery(target);
+
+            // Check if stub is open
+            var isSkipContentOpen = elem.hasClass('skip-active') ? 1 : 0;
+
+            // Hide all stubs
+            skipLinks.removeClass('skip-active');
+            skipContents.removeClass('skip-active');
+
+            // Toggle stubs
+            if (isSkipContentOpen) {
+                self.removeClass('skip-active');
+                elem.removeClass('skip-active');
+            } else {
+                self.addClass('skip-active');
+                elem.addClass('skip-active');
+            }
+        });
+
+
+        jQuery('#header-cart').on('click', '.skip-link-close', function(e) {
+
+            var parent = jQuery(this).parents('.skip-content');
+            var link = parent.siblings('.skip-link');
+
+            parent.removeClass('skip-active');
+            link.removeClass('skip-active');
+
+            e.preventDefault();
+
+        });
+
+        // Rebind tooltip events
+        jQuery('.truncated').each(function(){
+            jQuery(this).bind('mouseover', function(){
+                if (jQuery(this).children('div.truncated_full_value')) {
+                    jQuery(this).children('div.truncated_full_value').addClass('show')
+                }
+            });
+            jQuery(this).bind('mouseout', function(){
+                if (jQuery(this).children('div.truncated_full_value')) {
+                    jQuery(this).children('div.truncated_full_value').removeClass('show')
+                }
+            });
+
+        });
+
+        jQuery('#header-cart').removeAttr('style');
+
+
+      },
+      rebindPopup:function()
+      {
+      	jQuery("#popup").css('margin', (jQuery(window).height() / 2 - jQuery("#popup").height() / 2) + "px auto auto auto"); 
+			jQuery('.code-link a, .schedule-popup-link').on("click",function(e){
+				e.preventDefault();
+				var target=jQuery(this).attr("data-target");
+				jQuery("#popup_content").html(jQuery(target).html());
+				showPopup();
+			});
+		jQuery(window).resize(function() {
+		  jQuery("#popup").css('margin', (jQuery(window).height() / 2 - jQuery("#popup").height() / 2) + "px auto auto auto");
+		});
+      },
+      rebindQuickView:function()
+      {
+		setTimeout(function(){
+		installquickview(CMSMART.QuickView.BUTTON_CONFIG);
+		},500);
+      },
+	  prepareElements:function()
+	  {
+	  	/*if(jQuery("#ajax-add-by-sku").length==0)
+	  	{
+	  	  jQuery(".block-addbysku").find("button[type='submit']").attr("id","ajax-add-by-sku").attr("type","button");
+	  	}*/
+	  	var options=this.options;
+	  	jQuery(options.couponButton).removeAttr("onclick");
+	  	jQuery(options.giftcardButton).removeAttr("onclick");
+	  },
+	  getMiniCart:function()
+	  {		self=this;
+			jQuery.ajax({
+					url:"/checkout/cart/getMinicart",
+					dataType:"json",
+					success:function(data)
+					{
+						if(data['minicart_html'])
+					  	 {
+					  	 	jQuery('.header-minicart').html(data['minicart_html']);
+						  	self.rebindMinicart();
+					  	 }
+					},
+					error:function()
+					{
+
+					}
+
+			});
+	  },
+	  getCartTotals:function()
+	  {	self=this;
+
+		jQuery.ajax({
+			url:"/checkout/cart/getCartTotals/?ajaxTotal=1",
+			dataType:"json",
+			beforeSend:function()
+	  		{
+	  		   jQuery('.cart-totals #shopping-cart-totals-table').addClass("loading");
+	  		},
+			success:function(data)
+			{
+				if(data['total_html'])
+			  	 {
+		     	 	   jQuery('.cart-totals #shopping-cart-totals-table').replaceWith(data['total_html']);
+				 }
+			},
+			error:function()
+			{
+
+			},
+	  		complete:function()
+	  		{
+	  		   jQuery('.cart-totals #shopping-cart-totals-table').removeClass("loading");
+	  		}
+
+
+		});
+	  },
+	  scrollTo:function()
+	  {	
+	  	//try
+	  	{
+	  		 
+		 jQuery('html, body').animate({
+		    scrollTop: jQuery('.page-title').offset().top}, 1000);
+
+	  	}
+	  	//catch(e)
+	  	{
+
+	  	}
+	  },
+	  log:function(obj)
+	  {	 
+	  	 if(this.options.debug)
+	  	 {
+	  	  console.log(obj);
+	  	 }
+	  },
+
+
+}
+var ajaxCc=null;
+jQuery(function(){
+	ajaxCc=new ajaxCheckoutCart(jQuery,{"host":"http://staging.jerrysartarama.com"});
+})
+/*cart app ends*/

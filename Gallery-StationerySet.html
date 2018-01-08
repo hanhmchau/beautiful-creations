@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ella - Beautiful Creations</title>
+<link href="css/DropdownMenuLaptop.css" type="text/css" rel="stylesheet" media="screen and (min-width:768px)"/>
+<link href="css/DropdownMenuMobile.css" type="text/css" rel="stylesheet" media="screen and (max-width:768px)"/>
+<link href="css/HomeLaptop.css" type="text/css" rel="stylesheet" media="screen and (min-width:768px)"/>
+<link href="css/HomeMobile.css" type="text/css" rel="stylesheet" media="screen and (max-width:768px)"/>
+<link rel="stylesheet" href="resource/stylesheet.css" type="text/css" charset="utf-8" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="js/BigProduct.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/Item.js"></script>
+<script src="js/Utilities.js"></script>
+<script src="js/Filter.js"></script>
+<script src="js/PrintCart.js"></script>
+<script src="js/MagnifierPic.js"></script>
+<script>
+	window.onload=function(){
+		printAllStationery();
+		init();
+	}
+</script>
+<style>
+	#overview2-art{
+		width:100%;
+		padding-left:15%;
+		padding-right:15%;
+		text-align:center;
+		box-sizing:border-box;
+		float:left;
+	}
+	#overview2-art p{
+		display:block;
+		padding-left:20%;
+		width:60%;
+		font-size:14px;
+		color:darkslategray;
+	}
+</style>
+</head>
+
+<body>
+<!--the beginning of the page (above the banner image)-->
+  	<div class="container-smallport"><button class="smallport-dropdown" onClick="showMenu()"></button></div>
+<div id="small-menu">
+  <ul id="s-menu" class="menu">
+	<li class="has-accordion1">
+		<a class="click" href="#">Stationery</a>
+		<button id="accordion1" onClick="showInner(1);" class="accordion">+</button>
+	</li>
+	<li class="inner-li1"><a class="click" href="Gallery-WritingInstruments.html">Writing Instruments</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-PaperPad.html">Paper and Pad</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-DrawingInstruments.html">Drawing Instruments</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-StationerySet.html">Design Sets</a></li>	<li>
+		<a class="click" href="Blog.html">Blog</a>
+	</li>
+	<li>
+		<a class="click" href="AboutUs.html">About</a>
+	</li>
+	<li>
+		<a class="click" href="ContactUs.html">Contact Us</a>
+	</li>
+</ul>
+</div>
+<div id="mini-top">
+	<a href="#">English (EN)</a>
+	<a href="Cart.html">Cart</a>
+	<button id="search"><img src="resource/search2.png" width="15" height="15" alt=""/></button>
+</div>
+<div id="modal-search" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p class="search-title">Search Product</p>
+        <p class="search-description">Find our Beautiful Creations products</p>           <form onsubmit="return searchItem(0)" method="post">
+<input id="search-form" type="search" name="search" placeholder="Search product">
+            <input type="submit" value="Find >">
+        </form> </div>
+</div>
+<div id="header">
+<!--	the logo/brand name (click to go back to Homepage)-->
+	<a id="back-to-home-logo" href="Home.html">
+		<img src="resource/logo4.png" id="logo" height="75" alt=""/><br>
+	</a>
+</div>
+<div id="dropdown-menu" class="banner-less">
+  <ul class="menu">
+	<li>
+		<a class="click" href="#">Stationery</a>
+		<ul class="submenu">
+			<li><a href="Gallery-WritingInstruments.html" class="smallclick"><img class="icon-image" src="resource/pencil.png" alt=""/><br>
+			Writing Instruments</a></li>
+			<li><a href="Gallery-PaperPad.html" class="smallclick"><img class="icon-image" src="resource/paper.png" alt=""/><br>
+			Paper and Pad</a></li>
+			<li><a href="Gallery-DrawingInstruments.html" class="smallclick"><img class="icon-image" src="resource/palette.png" alt=""/><br>
+			Drawing Instruments</a></li>
+			<li><a href="Gallery-StationerySet.html" class="smallclick"><img class="icon-image" src="resource/stationery2.png" alt=""/><br>
+			Design Sets</a></li>
+		</ul>
+	</li>
+	<li>
+		<a class="click" href="Blog.html">Blog</a>
+	</li>
+	<li>
+		<a class="click" href="AboutUs.html">About</a>
+	</li>
+	<li>
+		<a class="click" href="ContactUs.html">Contact Us</a>
+	</li>
+</ul>
+</div>
+<!--
+FILL IN THE BLANKS
+-->
+
+<div id="overview1">
+	<div class="text">
+		<span>Series Overview</span>
+		<span>A pocketful of sunshine.</span>
+		<span>
+Almost everything has gone digital now, but nothing still beats doing the old-school things we loved. If you’re into journaling, paper cutting, scrapbooking, or letter writing, these Paper & Stationery Subscription Boxes might just be what you need. 
+		</span>
+	</div>
+	<div class="bigpic"><img src="resource/stationerybox.jpg" height="400" alt=""/></div>
+</div>
+
+<div id="overview2-art">
+	<img src="resource/stationery3.jpg" alt=""/>
+	<p>Our stationery will make your recipient’s day a little sweeter and brighter. Our collection includes some of the brightest, sweetest, and boldest stationery sets.<br><br>From boxed note cards and labels to notepads and writing sheets, your messages will be dressed in their very best.
+<br><br>
+In all the areas in which we endeavor, our stores' goal has been to carry the best known, globally established brands. Our mission boils down to providing customers with top quality products, low prices, fast shipping, and a friendly, predictable, hassle-free shopping experience. 
+</p>
+</div>
+
+<div id="overview3">
+	<span class="big-line">Gallery</span>
+	 <div id="gallery-container" class="container">
+        <div class="row">
+        
+        <div align="center">
+            <button class="btn btn-default filter-button active-filter" data-filter="all">All</button>
+            <button class="btn btn-default filter-button" data-filter="boxed">Boxed Notes</button>
+            <button class="btn btn-default filter-button" data-filter="case">Stationery Cases</button>
+            <button class="btn btn-default filter-button" data-filter="giftbox">Gift Boxes</button>
+        </div>
+        <br/>
+        </div>
+    </div>
+</div>
+
+<!--
+END OF BLANKS
+-->
+
+<div id="bottom">
+	<div class="bottom1"><img src="resource/logo4.png" height="80" alt=""/></div>
+	<div class="third2">
+	<span>Selected Dealers</span>
+	  <a href="#" class="bottom-button">Find a store</a>
+	</div>
+	<div class="third2">
+	  <span>Contact</span>
+	  <a href="ContactUs.html">Contact Us</a>
+	</div>
+	<div class="third2">
+	  <span>Pen of the Year</span>
+	  <a href="#" class="bottom-button">Registration</a>
+	</div>
+	<hr width="100%">
+	<div id="lean-left">
+		<span>© Ella- Beautiful Creations 2017</span>
+	  	<a href="#">Presses</a>
+	    <a href="#">Service Address</a>
+	    <a href="#">Imprint</a>
+	</div>
+	<div id="lean-right">
+		<span>Follows us: </span>
+		<!-- Add font awesome icons -->
+		<a href="#" class="fa fa-facebook"></a>
+		<a href="#" class="fa fa-twitter"></a>
+	</div>
+</div>
+</body>
+</html>
+<script>
+// Get the modal
+    var modal = document.getElementById("modal-search");
+// Get the button that opens the modal
+    var btn = document.getElementById("search");
+
+// Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+// When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>

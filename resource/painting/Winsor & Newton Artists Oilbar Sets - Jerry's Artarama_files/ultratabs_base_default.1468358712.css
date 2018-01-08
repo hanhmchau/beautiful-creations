@@ -1,0 +1,58 @@
+.ut_border_color {
+	border: 1px solid #F5F5F5;
+}
+#ultratabs div.content > div {
+	border-color: #F5F5F5;
+}
+#ultratabs.ut_vertical .ut_tabs_bar ul.nav li .ut_border_helper {
+	background-color: #F5F5F5;
+}
+.ut_bg_color,
+#ultratabs ul.nav li,
+#ultratabs .tab_drawer {
+	background-color: #97B9C5;
+}
+#ultratabs ul.nav li a,
+#ultratabs .tab_drawer {
+	color: #FFFFFF;
+}
+#ultratabs .ut_active_line {
+	border: 1px solid #97B9C5;
+}
+#ultratabs ul.nav li.active,
+#ultratabs ul.nav li.active:hover,
+#ultratabs .ut_tabs_bar ul.nav li.active .ut_border_helper,
+#ultratabs .tab_drawer.active,
+#ultratabs .tab_drawer.active:hover,
+#ultratabs div.content > div {
+	background: #FAFAFA;
+}
+#ultratabs ul.nav li.active a,
+#ultratabs ul.nav li.active:hover a,
+#ultratabs .tab_drawer.active,
+#ultratabs .tab_drawer.active:hover,
+#ultratabs div.content > div,
+#ultratabs div.content > div h2 {
+	color: #E37274;
+}
+#ultratabs ul.nav li:hover,
+#ultratabs .tab_drawer:hover {
+	background: #B2CED8;
+}
+#ultratabs ul.nav li:hover a,
+#ultratabs .tab_drawer:hover {
+	color: #FFFFFF;
+}
+
+#ultratabs div.content > div {
+	background: #FFFFFF;
+}
+#ultratabs div.content > div, #ultratabs div.content > div h2 {
+	color: #636363;
+}
+#ultratabs div.content > div a {
+	color: #97B9C5;
+}
+#ultratabs div.content > div a:hover {
+	color: #6595A6;
+}

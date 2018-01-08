@@ -1,0 +1,19 @@
+/**
+ * Created by imacjoker on 3/30/16.
+ */
+Validation.add('validate-qty-limit', 'You can only entry quantites less than 1000 at one time.', function(v, elm) {
+    if (Validation.get('IsEmpty').test(v)) {
+        return true;
+    }
+
+    var numValue = parseNumber(v);
+    if (isNaN(numValue)) {
+        return false;
+    }
+
+    if(v > 999) {
+        return false;
+    }
+
+    return result;
+})

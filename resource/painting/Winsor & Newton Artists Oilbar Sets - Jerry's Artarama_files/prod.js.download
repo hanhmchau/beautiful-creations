@@ -1,0 +1,190 @@
+var flxAds = (function() {
+	var JSON = {
+		params : function(a1){
+			var u=[];
+			for(var x in a1){
+				if (a1.hasOwnProperty(x)) { 
+					if(a1[x] instanceof Array)
+						u.push(x+"="+encodeURIComponent(a1[x].join(",")));
+					else
+						u.push(x+"="+encodeURIComponent(a1[x]));
+				}
+			}
+			return u.join("&");
+		}
+	};
+
+	var placePixel = function(url) {
+		var i = document.createElement("img");
+		i.onload = function(){};
+		i.src = url;
+	};
+	var send = function(iatProd) {
+		if(iatProd) {
+			iatProd['r'] = (Math.random()*1e16);
+			placePixel('//dc.flxads.com/'+iatDomain+'/log?' + JSON.params(iatProd));
+			
+			var eventObj = (function() {
+				var eventObj = {};
+				eventObj.hidden = false;
+				function addEvent(obj, evType, fn, isCapturing) {
+					if (isCapturing == null) isCapturing = false;
+					if (obj.addEventListener) {
+						// Firefox
+						obj.addEventListener(evType, fn, isCapturing);
+						return true;
+					} else if (obj.attachEvent) {
+						// MSIE
+						var r = obj.attachEvent('on' + evType, fn);
+						return r;
+					} else {
+						return false;
+					}
+				}
+
+				// register to the W3C Page Visibility API
+				var hidden = null;
+				var visibilityChange = null;
+				if (typeof document.mozHidden !== "undefined") {
+					hidden = "mozHidden";
+					visibilityChange = "mozvisibilitychange";
+				} else if (typeof document.msHidden !== "undefined") {
+					hidden = "msHidden";
+					visibilityChange = "msvisibilitychange";
+				} else if (typeof document.webkitHidden !== "undefined") {
+					hidden = "webkitHidden";
+					visibilityChange = "webkitvisibilitychange";
+				} else if (typeof document.hidden !== "hidden") {
+					hidden = "hidden";
+					visibilityChange = "visibilitychange";
+				}
+				if (hidden != null && visibilityChange != null) {
+					addEvent(document, visibilityChange, function (event) {
+						if(document[hidden]) {
+							eventObj.hidden = true;
+						} else {
+							eventObj.hidden = false;
+						}
+					});
+				}
+
+				// register to the potential page visibility change
+				addEvent(document, "potentialvisilitychange", function (event) {
+					if(eventObj.potentialHidden) {
+						eventObj.hidden = true;
+					} else {
+						eventObj.hidden = false;
+					}
+				});
+
+
+
+				var potentialPageVisibility = {
+					pageVisibilityChangeThreshold: 3,
+					// in seconds
+					init: function () {
+						function setAsNotHidden() {
+							var dispatchEventRequired = eventObj.potentialHidden;
+							eventObj.potentialHidden = false;
+							eventObj.potentiallyHiddenSince = 0;
+							if (dispatchEventRequired) dispatchPageVisibilityChangeEvent();
+						}
+
+						function initPotentiallyHiddenDetection() {
+							// the window does not has the focus => check for  user activity in the window
+							lastActionDate = new Date();
+							if (timeoutHandler != null) {
+								clearInterval(timeoutHandler);
+							}
+							timeoutHandler = setInterval(checkPageVisibility, potentialPageVisibility.pageVisibilityChangeThreshold * 1000 + 100); // +100 ms to avoid rounding issues under Firefox
+						}
+
+						function dispatchPageVisibilityChangeEvent() {
+							unifiedVisilityChangeEventDispatchAllowed = false;
+							if( document.createEvent ) {
+								var evt = document.createEvent("Event");
+								evt.initEvent("potentialvisilitychange", true, true);
+								document.dispatchEvent(evt);
+							}
+						}
+
+						function checkPageVisibility() {
+							var potentialHiddenDuration = (lastActionDate == null ? 0 : Math.floor((new Date().getTime() - lastActionDate.getTime()) / 1000));
+							eventObj.potentiallyHiddenSince = potentialHiddenDuration;
+							if (potentialHiddenDuration >= potentialPageVisibility.pageVisibilityChangeThreshold && !eventObj.hidden) {
+								// page visibility change threshold raiched => raise the even
+								eventObj.potentialHidden = true;
+								dispatchPageVisibilityChangeEvent();
+							}
+						}
+
+						var lastActionDate = new Date();
+						var hasFocusLocal = true;
+						var hasMouseOver = true;
+						eventObj.potentialHidden = false;
+						eventObj.potentiallyHiddenSince = 0;
+						var timeoutHandler = null;
+
+						addEvent(document, "mousemove", function (event) {
+							lastActionDate = new Date();
+						});
+						addEvent(document, "mouseover", function (event) {
+							hasMouseOver = true;
+							setAsNotHidden();
+						});
+						addEvent(document, "mouseout", function (event) {
+							hasMouseOver = false;
+						});
+						addEvent(window, "blur", function (event) {
+							hasFocusLocal = false;
+							eventObj.potentialHidden = true;
+							dispatchPageVisibilityChangeEvent();
+						});
+						addEvent(window, "focus", function (event) {
+							hasFocusLocal = true;
+							setAsNotHidden();
+						});
+						addEvent(window, "focusin", function (event) {
+							hasFocusLocal = true;
+							setAsNotHidden();
+						});
+						addEvent(window, "focusout", function (event) {
+							hasFocusLocal = false;
+							eventObj.potentialHidden = true;
+							dispatchPageVisibilityChangeEvent();
+						});
+						setAsNotHidden();
+						initPotentiallyHiddenDetection();
+					}
+				}
+
+				potentialPageVisibility.pageVisibilityChangeThreshold = 15;
+				potentialPageVisibility.init();
+				return eventObj;
+			})();
+			if(iatProd.prodId) {
+				window.setInterval(function() {
+						if(!eventObj.hidden) {
+							placePixel('//dc.flxads.com/'+iatDomain+'/time?prodId=' + iatProd['prodId'] + '&time=10&r='+(Math.random()*1e16));
+						}
+				}, 10000);
+			}
+		}
+	}; //end send
+
+	var remove = function(iatProd) {
+		iatProd['r'] = (Math.random()*1e16);
+		placePixel('//dc.flxads.com/'+iatDomain+'/remove?' + JSON.params(iatProd));
+	}
+	if(window.iatProd) {
+		if(!window.iatProd['remove']) {
+			send(iatProd);
+		} else {
+			remove(iatProd);
+		}
+	}
+	return {
+		send: send,
+		remove: remove
+	}
+})();

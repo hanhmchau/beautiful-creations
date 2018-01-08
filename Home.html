@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ella - Beautiful Creations</title>
+<link href="css/DropdownMenuLaptop.css" type="text/css" rel="stylesheet" media="screen and (min-width:768px)"/>
+<link href="css/DropdownMenuMobile.css" type="text/css" rel="stylesheet" media="screen and (max-width:768px)"/>
+<link href="css/HomeLaptop.css" type="text/css" rel="stylesheet" media="screen and (min-width:768px)"/>
+<link href="css/HomeMobile.css" type="text/css" rel="stylesheet" media="screen and (max-width:768px)"/>
+<link rel="stylesheet" href="resource/stylesheet.css" type="text/css" charset="utf-8" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="js/Utilities.js"></script>
+<script src="js/BigProduct.js"></script>
+
+<script>
+		var x;
+		var first=1;
+		
+</script>
+</head>
+
+<body onLoad="firstClick();">
+<!--the beginning of the page (above the banner image)-->
+  	<div class="container-smallport"><button class="smallport-dropdown" onClick="showMenu()"></button></div>
+<div id="small-menu">
+	<ul id="s-menu" class="menu">
+	<li class="has-accordion1">
+		<a class="click" href="#">Stationery</a>
+		<button id="accordion1" onClick="showInner(1);" class="accordion">+</button>
+	</li>
+	<li class="inner-li1"><a class="click" href="Gallery-WritingInstruments.html">Writing Instruments</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-PaperPad.html">Paper and Pad</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-DrawingInstruments.html">Drawing Instruments</a></li>
+	<li class="inner-li1"><a class="click" href="Gallery-StationerySet.html">Design Sets</a></li>
+	<li>
+		<a class="click" href="Blog.html">Blog</a>
+	</li>
+	<li>
+		<a class="click" href="AboutUs.html">About</a>
+	</li>
+	<li>
+		<a class="click" href="ContactUs.html">Contact Us</a>
+	</li>
+</ul>
+</div>
+
+<div id="mini-top">
+	<a href="#">English (EN)</a>
+	<a href="Cart.html">Cart</a>
+	<button id="search"><img src="resource/search2.png" width="15" height="15" alt=""/></button>
+</div>
+
+<div id="modal-search" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p class="search-title">Search Product</p>
+        <p class="search-description">Find our Beautiful Creations products</p>           <form onsubmit="return searchItem(0)" method="post">
+<input id="search-form" type="search" name="search" placeholder="Search product">
+            <input type="submit" value="Find >">
+        </form> </div>
+</div>
+<div id="flowdown">
+<div id="header">
+<!--	the logo/brand name (click to go back to Homepage)-->
+	<a id="back-to-home-logo" href="Home.html">
+		<img src="resource/logo4.png" id="logo" height="75" alt=""/><br>
+	</a>
+</div>
+<div id="dropdown-menu">
+  <ul class="menu">
+	<li>
+		<a class="click" href="#">Stationery</a>
+		<ul class="submenu">
+			<li><a href="Gallery-WritingInstruments.html" class="smallclick"><img class="icon-image" src="resource/pencil.png" alt=""/><br>
+			Writing Instruments</a></li>
+			<li><a href="Gallery-PaperPad.html" class="smallclick"><img class="icon-image" src="resource/paper.png" alt=""/><br>
+			Paper and Pad</a></li>
+			<li><a href="Gallery-DrawingInstruments.html" class="smallclick"><img class="icon-image" src="resource/palette.png" alt=""/><br>
+			Drawing Instruments</a></li>
+			<li><a href="Gallery-StationerySet.html" class="smallclick"><img class="icon-image" src="resource/stationery2.png" alt=""/><br>
+			Design Sets</a></li>
+		</ul>
+	</li>
+	<li>
+		<a class="click" href="Blog.html">Blog</a>
+	</li>
+	<li>
+		<a class="click" href="AboutUs.html">About</a>
+	</li>
+	<li>
+		<a class="click" href="ContactUs.html">Contact Us</a>
+	</li>
+</ul>
+</div>
+</div>
+<div id="banner-container">
+	<a id="pic" href="Gallery-PaperPad.html">
+		<div id="large-picture" class="picture"></div>
+		<span id="big-text">
+		</span>
+		<span id="small-text">
+		</span>
+	<span id="main-ghost-button">Learn More Now</span>
+	</a>
+	<a class="button" id="button1" onclick="changePicture(1)">
+		<span>Persistence of Memory</span><br>
+		<span>Azure</span>
+	</a>
+	<a class="button" id="button2" onclick="changePicture(2)">
+		<span>English Fern</span><br>
+		<span>Orchid</span>
+	</a>
+	<a class="button" id="button3" onclick="changePicture(3)">
+		<span>Pianissimo</span><br>
+		<span>Corn silk</span>
+	</a>
+	<a class="button" id="button4" onclick="changePicture(4)">
+		<span>Love in White Cred</span><br>
+		<span>Ghostwhite</span>
+	</a>
+</div>
+<div id="body1">
+	<div class="body1a">
+    <img src="resource/german.png" alt=""/> </div>
+  <div class="body1b">
+		<div>german brand award winner'16 in Category:
+		#2 Industry Excellence in Branding – Luxury</div>
+		<div>
+			The luxury brand Graf von Faber-Castell, launched in 1993, is still guided by the standard defined by Lothar von Faber in the 4th generation of the company – the pursuit of the highest quality – focusing special attention on the world of writing by hand.
+		</div>
+		<div>
+			Besides the natural materials, it is primarily the combination of premium woods with precious metals and meticulous craftsmanship that make the vital contribution to the uniqueness of the collection.
+		</div>
+  </div>
+</div>
+<div id="body2">
+	<div class="big entry">
+		<a id="half" class="fill-link" href="Gallery-StationerySet.html"></a>
+		<a class="fill-text big-center" href="Gallery-StationerySet.html">
+			<span class="first-line">Oats we sow</span>
+			<span>Stationery Design</span>
+		</a>
+	</div>
+	<div class="medium entry">
+		<a id="quarter" class="fill-link" href="Gallery-DrawingInstruments.html"></a>
+		<a class="fill-text medium-center" href="Gallery-DrawingInstruments.html">
+			<span>Fireworks</span>
+			<span>Color pencils</span>
+		</a>
+	</div>
+	<div class="small entry">
+		<a id="eighth1" class="fill-link" href="Gallery-PaperPad.html"></a>	
+		<a class="fill-text small-center" href="Gallery-PaperPad.html">
+			<span>A blank letter</span>
+			<span>Paper</span>
+		</a>	
+	</div>
+	<div class="small entry">
+		<a id="eighth2" class="fill-link small-center" href="Gallery-PaperPad.html"></a>
+		<a class="fill-text small-center" href="Gallery-PaperPad.html">
+			<span>Pretentious</span>
+			<span>Notebook</span>
+		</a>	
+	</div>
+</div>
+<div id="body3">
+	<a class="third-part" href="Gallery-WritingInstruments.html">
+		<div>Perfect Pencils</div>
+		<div class="small-pic" id="pic1"></div>
+		<div>Beauty and Precision</div>
+		<div>Read more</div>
+	</a>
+	<a class="third-part" href="AboutUs.html">
+		<div>Company</div>
+		<div class="small-pic" id="pic2"></div>
+		<div>Tradition and Perfection</div>
+		<div>Read more</div>
+	</a>
+	<a class="third-part" href="Gallery-WritingInstruments.html">
+		<div>Desk Accessories Epsom</div>
+		<div class="small-pic" id="pic3"></div>
+		<div>The perfect desk</div>
+		<div>Read more</div>
+	</a>
+</div>
+<div id="bottom">
+	<div class="bottom1"><img src="resource/logo4.png" height="80" alt=""/></div>
+	<div class="third2">
+	<span>Selected Dealers</span>
+	  <a href="#" class="bottom-button">Find a store</a>
+	</div>
+	<div class="third2">
+	  <span>Contact</span>
+	  <a href="ContactUs.html">Contact Us</a>
+	</div>
+	<div class="third2">
+	  <span>Pen of the Year</span>
+	  <a href="#" class="bottom-button">Registration</a>
+	</div>
+	<hr width="100%">
+	<div id="lean-left">
+		<span>© Ella- Beautiful Creations 2017</span>
+	  	<a href="#">Presses</a>
+	    <a href="#">Service Address</a>
+	    <a href="#">Imprint</a>
+	</div>
+	<div id="lean-right">
+		<span>Follows us: </span>
+		<!-- Add font awesome icons -->
+		<a href="#" class="fa fa-facebook"></a>
+		<a href="#" class="fa fa-twitter"></a>
+	</div>
+</div>
+</body>
+</html>
+
+
+<script type="text/javascript">
+ 
+// Get the modal
+    var modal = document.getElementById("modal-search");
+// Get the button that opens the modal
+    var btn = document.getElementById("search");
+
+// Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+// When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>

@@ -1,0 +1,21 @@
+#csmm_quickform .product-quickview .yousavex-message .savePercent::before {
+    background: rgba(0, 0, 0, 0) url("../../../../../blueacorn/jerrys/images/icon_sprite.png") no-repeat scroll -644px -169px;
+    content: "";
+    display: inline-block;
+    height: 21px;
+    left: 0;
+    position: relative;
+    top: 0;
+    width: 21px;
+}
+#csmm_quickform  .product-quickview .yousavex-message .savePercent {
+    color: #e65757;
+    margin-bottom: 7px;
+   /* padding-left: 30px;*/
+    position: relative;
+}
+#csmm_quickform .product-quickview .yousavex-message .savePercent, #csmm_quickform .product-quickview .yousavex-message .saveAmount {
+    font-size: 17px;
+    text-transform: uppercase;
+}
+

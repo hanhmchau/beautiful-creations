@@ -1,0 +1,30 @@
+/**
+ * Created by mcoffey on 11/11/15.
+ */
+$j(document).ready(function () {
+    //when country_id is changed
+    $j('#shipping-new-address-form').on('change', '#shipping\\:country_id', function(e) {
+        if($j('#shipping\\:country_id').val() != 'US') {
+            //change ZIP validation for outside USA
+            $j('#shipping\\:postcode').removeClass( "validate-zip" );
+            $j('#shipping\\:postcode').addClass( "validate-zip-international" );
+        } else {
+            //change ZIP validation for outside USA
+            $j('#shipping\\:postcode').removeClass( 'validate-zip-international' );
+            $j('#shipping\\:postcode').addClass( 'validate-zip' );
+        }
+
+
+    });
+    $j('#billing-new-address-form').on('change', '#billing\\:country_id', function(e) {
+        if ($j('#billing\\:country_id').val() != 'US') {
+            //change ZIP validation for outside USA
+            $j('#billing\\:postcode').removeClass("validate-zip");
+            $j('#billing\\:postcode').addClass("validate-zip-international");
+        } else {
+            //change ZIP validation for outside USA
+            $j('#billing\\:postcode').removeClass('validate-zip-international');
+            $j('#billing\\:postcode').addClass('validate-zip');
+        }
+    });
+});

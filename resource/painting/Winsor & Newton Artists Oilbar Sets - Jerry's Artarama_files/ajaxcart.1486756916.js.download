@@ -1,0 +1,524 @@
+var simpleProductData = [];
+
+$j(document).ready(function() {
+    $j(document).on('yousavedx:update', function(){
+        $j.ajax({
+            url: window.location.origin + '/mysavings/update/update/'
+        }).done( function(response){
+            var result = JSON.parse(response);
+            $j(".yousavex-message").text(result.message);
+        });
+    });
+
+    $j(".grouped-items-table .input-text.qty").addClass('validate-greater-than-zero');
+
+    if (!$j('body').attr('class').match(/.+catalog-product-view.+/) && !$j('body').attr('class').match(/.+blueacorn-lessonvideos-video-view.+/)) {
+        try{
+        $j('.btn-cart').each(function() {
+            // Extract URL from onclick action
+            if(!$j(this).attr('onclick'))
+            var url = $j(this).attr('onclick').match(/setLocation\(\'(.+)\'\)/).last();
+
+            // If URL is an add to cart URL Ajaxify it
+            if(url.match(/.+checkout\/cart\/add\/.+/)) {
+                // Detach onclick action
+                $j(this).attr('onclick', '');
+
+                // Attach AjaxCart observer to add to cart buttons
+                $j(this).on('click', function () {
+
+                    // Show fancy box with ajax_cart_form
+                    $j.fancybox.open({
+                        content: '<form action="'+url+'" method="POST" id="ajax_cart_form">' +
+                            '<input type="text" name="qty" id="qty" value="1" />' +
+                            '<button class="button btn-cart" type="submit" title="Add to Cart">' +
+                            '<span><span>Add to Cart</span></span>' +
+                            '</button>' +
+                            '</form>'
+                    });
+
+                    // Bind Ajaxcart observer to submit action
+                    $j('#ajax_cart_form').bind('submit', function(e) {
+                        // Close fancy box
+                        $j.fancybox.close();
+
+                        // Prevent form from submitting
+                        e.preventDefault();
+
+                        // Gather data from product_addtocart_form
+                        var data = {};
+                        $j.each($j(this).serializeArray(), function(i, field) {
+                            data[field.name] = field.value;
+                        });
+
+                        // Instantiate Ajaxcart with url from button
+                        ajaxcart = new Ajaxcart(url);
+
+                        // Let the ajax happen
+                        ajaxcart.addToCart(data);
+                        ajaxcart.rebindMinicart();
+                    });
+                });
+            }
+        });
+       }
+       catch(e)
+       {
+
+       }
+    } else {
+
+        // Simple products add to cart--------------------------------------
+        // Atach AjaxCart observer to add to cart button for simple products
+        $j('.product-shop').on('click', '.btn-cart', function(e) {
+            e.stopImmediatePropagation();
+            var ajaxContinue = false;
+
+            // Validate product_addtocart_form before attempting AJAX
+            if (productAddToCartForm.validator.validate()) {
+
+                // Gather data from product_addtocart_form
+                var data = {};
+                var pid = $j( "input[name='product']").val();
+                var stringToSearchFor = "super_group[";
+                var name= stringToSearchFor + pid+ "]";
+                data["form_key"] = $j( "input[name='form_key']").val();
+                data["product"] = pid;
+                data[name] = $j('#qty').val();
+
+                //if gift card add more fields ------------------------------
+                if($j('.giftcard-send-form')) {
+                    data['giftcard_amount'] = $j('#giftcard_amount').val();
+                    if(data['giftcard_amount'] == 'custom') data['custom_giftcard_amount'] = $j('#giftcard_amount_input').val();
+                    data['giftcard_sender_name'] = $j('#giftcard_sender_name').val();
+                    data['giftcard_sender_email'] = $j('#giftcard_sender_email').val();
+                    data['giftcard_recipient_name'] = $j('#giftcard_recipient_name').val();
+                    data['giftcard_recipient_email'] = $j('#giftcard_recipient_email').val();
+                    data['giftcard_message'] = $j('#giftcard_message').val();
+                }
+                //if gift card add more fields ------------------------------
+
+                ajaxContinue = true;
+
+                if(ajaxContinue){
+                    // Instantiate Ajaxcart with url from form action
+                    ajaxcart = new Ajaxcart($j('#product_addtocart_form').attr('action'));
+
+                    // Let the ajax happen
+                    ajaxcart.addToCart(data);
+                    ajaxcart.rebindMinicart();
+
+                }else {
+                    // Show fancy box with ajax_cart_form
+                    $j.fancybox.open({
+                        height : '95',
+                        closeBtn : false,
+                        autoDimensions: true,
+                        content: '<div class="add-to-cart-error">Please specify the quantity of product(s).</div>'
+                    });
+
+                    setTimeout(function() {
+                        $j.fancybox.close();
+                    }, 3000);
+                }
+
+            }
+        });
+        // End Simple products add to cart--------------------------------------
+
+        // Grouped products add to cart--------------------------------------
+        // Atach AjaxCart observer to add to cart button for grouped products
+        $j('#products-grid-wrapper').on('click', '.btn-cart', function(e) {
+            e.stopImmediatePropagation();
+            var ajaxContinue = false;
+
+            // Validate product_addtocart_form before attempting AJAX
+            if (productAddToCartForm.validator.validate()) {
+
+                // Gather data from product_addtocart_form
+                var data = {};
+                simpleProductData = [];
+                var stringToSearchFor = "super_group[";
+                data["form_key"] = $j( "input[name='form_key']").val();
+                data["product"] = $j( "input[name='product']").val();
+
+                $j.each($j('.qty').serializeArray(), function(i, field) {
+                    if(field.value > 0) {
+                        ajaxContinue = true;
+                        data[field.name] = field.value;
+                        var currentSimple = $j('input[name="' + field.name + '"]').parent().parent();
+                        var currentProduct = {
+                            sku: currentSimple.siblings('.item').text(),
+                            qty: field.value
+                        };
+                        simpleProductData.push(currentProduct);
+                    }
+                });
+
+                if(ajaxContinue){
+                    // Instantiate Ajaxcart with url from form action
+                    ajaxcart = new Ajaxcart($j('#product_addtocart_form').attr('action'));
+
+                    // Let the ajax happen
+                    ajaxcart.addToCart(data);
+                    ajaxcart.rebindMinicart();
+
+                }else {
+                    // Show fancy box with ajax_cart_form
+                    $j.fancybox.open({
+                        height : '95',
+                        closeBtn : false,
+                        autoDimensions: true,
+                        content: '<div class="add-to-cart-error">Please specify the quantity of product(s).</div>'
+                    });
+
+                    setTimeout(function() {
+                        $j.fancybox.close();
+                    }, 3000);
+                }
+
+            }
+        });
+        // End Grouped products add to cart--------------------------------------
+    }
+
+    $j(document).on('click', '.close-confirm', function(){
+        $j.fancybox.close();
+    });
+
+    $j(document).on('rebind-minicart', function(event, data) {
+        var skipContents = $j('.skip-content');
+        var skipLinks = $j('.skip-link');
+
+        /*skipLinks.on('click', function (e) {
+            e.preventDefault();
+
+            var self = $j(this);
+            var target = self.attr('href');
+
+            // Get target element
+            var elem = $j(target);
+
+            // Check if stub is open
+            var isSkipContentOpen = elem.hasClass('skip-active') ? 1 : 0;
+
+            // Hide all stubs
+            skipLinks.removeClass('skip-active');
+            skipContents.removeClass('skip-active');
+
+            // Toggle stubs
+            if (isSkipContentOpen) {
+                self.removeClass('skip-active');
+            } else {
+                self.addClass('skip-active');
+                elem.addClass('skip-active');
+            }
+        });*/
+
+
+        $j('#header-cart').on('click', '.skip-link-close', function(e) {
+            var parent = $j(this).parents('.skip-content');
+            var link = parent.siblings('.skip-link');
+
+            parent.removeClass('skip-active');
+            link.removeClass('skip-active');
+
+            e.preventDefault();
+        });
+
+        // Rebind tooltip events
+        $j('.truncated').each(function(){
+            $j(this).bind('mouseover', function(){
+                if ($j(this).children('div.truncated_full_value').length) {
+                    $j(this).children('div.truncated_full_value').addClass('show')
+                }
+            });
+            $j(this).bind('mouseout', function(){
+                if ($j(this).children('div.truncated_full_value').length) {
+                    $j(this).children('div.truncated_full_value').removeClass('show')
+                }
+            });
+
+        });
+    });
+
+});
+
+$j(document).on('click',function(e) {
+    var clickTarget = $j(e.target);
+    var skipContents = $j('.skip-content');
+    var skipLinks = $j('.skip-link');
+
+    if(clickTarget.parents('#header-cart').length == 0) {
+
+        // Check if stub is open
+        var isSkipContentOpen = skipLinks.hasClass('skip-active') ? 1 : 0;
+
+        // Check if click is on skip-link
+        var isSkipLink = clickTarget.parents().hasClass('skip-link') ? 1 : 0;
+
+        if(isSkipContentOpen && !isSkipLink) {
+            skipLinks.removeClass('skip-active');
+            skipContents.removeClass('skip-active');
+
+        }
+    }
+});
+
+function Ajaxcart(url) {
+    this.url = url;
+    var minicartOptions  = {
+        formKey:    $j('#form_key').html()
+    }
+    this.Mini = new Minicart(minicartOptions);
+};
+
+Ajaxcart.prototype = {
+    addToCart: function(data) {
+        //add loading overlay
+        //$j.isLoading({ text: "Adding to cart", position: "overlay" });
+        $j.isLoading({ text: "Adding to cart", position: "overlay", 'tpl': '<span class="isloading-wrapper %wrapper%"><img src="/skin/frontend/blueacorn/jerrys/images/loading.gif"/><span class="adding-to-cart">Adding to cart...</span></span>'  });
+        var self = this;
+        // Append Minicart formKey to the data so form actions function
+        data['formKey'] = self.Mini.formKey;
+
+        // Scroll back to the top **REMOVED**
+        // $j("html, body").animate({ scrollTop: 0 }, "slow");
+
+        confirm = $j('#show-ajaxmini-confirmation').attr('value');
+        if(confirm != 1){
+            self.showMinicart(true);
+        }
+
+        $j.ajax({
+            url: self.url,
+            dataType: "json",
+            type: "POST",
+            context: self,
+            data: data
+        }).done(function(result) {
+            // Replace Minicart HTML
+            $j('.header-minicart').html(result.minicart_html);
+
+            successMsg = result.success;
+            productInfo = result.productInfo;
+
+            if(confirm == 1){
+                buildConfirmation(successMsg, productInfo);
+                // Rebind Minicart actions
+                self.rebindMinicart();
+            } else {
+                // Persist minicart visibility
+                self.showMinicart(false);
+
+                // Add success message
+                self.Mini.showSuccess(result.success);
+                setTimeout( function(){
+                    $j('#header-cart').fadeOut('slow');
+                }, 4000);
+
+                // Rebind Minicart actions
+                self.rebindMinicart();
+                $j(document).trigger('ajaxcart-complete');
+                //$j('#products-grid').hideOverlay();
+            }
+            $j.isLoading( "hide" );
+
+            // Reinit Minicart
+            self.Mini.init();
+
+            self.rebindMinicart();
+
+
+            $j("#item-count").html(result.item_count);
+
+              if(result.item_count>0) {
+                $j(".checkout-cart-link").removeClass("no-display");
+              }
+              else
+              {
+                $j(".checkout-cart-link").addClass("no-display");
+              }
+
+            //reset the qty boxes to zero
+            var stringToSearchFor = "super_group[";
+            $j.each(data, function( key, value ) {
+                //if key is super_group
+                if(key.indexOf(stringToSearchFor) > -1) {
+                    //reset all qty for added items
+                    $j('input[name="' + key + '"]').val(0);
+                }
+            });
+
+        }).error(function(e) {
+            var message = result.message;
+            $j.isLoading( "hide" );
+            buildErrorBox(message);
+            console.log('AJAX Cart Error');
+        });
+    },
+
+    // Shows minicart with loading overlay
+    showMinicart: function(loading) {
+        $j('.header-minicart a').addClass('skip-active');
+        $j('#header-cart').addClass('skip-active');
+        if (loading) {
+            this.Mini.showOverlay();
+        }
+        this.Mini.hideMessage();
+    },
+
+    rebindMinicart: function() {
+
+        var skipContents = $j('.skip-content');
+        var skipLinks = $j('.skip-link').not('.skip-nav');
+
+        $j(document).on('mousedown', function(){
+            $j('#header-cart').removeAttr('style');
+        });
+        /*
+        $j(document).on('click', '.skip-link', function (e) {
+
+            e.preventDefault();
+
+            var self = $j(this);
+            var target = self.attr('href');
+
+            // Get target element
+            var elem = $j(target);
+
+            // Check if stub is open
+            var isSkipContentOpen = elem.hasClass('skip-active') ? 1 : 0;
+
+            // Hide all stubs
+            skipLinks.removeClass('skip-active');
+            skipContents.removeClass('skip-active');
+
+            // Toggle stubs
+            if (isSkipContentOpen) {
+                self.removeClass('skip-active');
+                elem.removeClass('skip-active');
+            } else {
+                self.addClass('skip-active');
+                elem.addClass('skip-active');
+            }
+        });
+        */
+
+        $j('#header-cart').on('click', '.skip-link-close', function(e) {
+
+            var parent = $j(this).parents('.skip-content');
+            var link = parent.siblings('.skip-link');
+
+            parent.removeClass('skip-active');
+            link.removeClass('skip-active');
+
+            e.preventDefault();
+
+        });
+
+        // Rebind tooltip events
+        $j('.truncated').each(function(){
+            $j(this).bind('mouseover', function(){
+                if ($j(this).children('div.truncated_full_value')) {
+                    $j(this).children('div.truncated_full_value').addClass('show')
+                }
+            });
+            $j(this).bind('mouseout', function(){
+                if ($j(this).children('div.truncated_full_value')) {
+                    $j(this).children('div.truncated_full_value').removeClass('show')
+                }
+            });
+
+        });
+
+        $j('#header-cart').removeAttr('style');
+
+
+    }
+};
+
+function buildConfirmation(successMsg, productInfo){
+    var html = "";
+    var saveHtml = "";
+    var fancyBoxContent = "";
+    checkoutUrl = $j('.checkout-button').attr('href');
+    checkoutOPCUrl = $j('.logo').attr('href') + 'checkout/cart';
+
+    html += "<ul>";
+    $j.each(simpleProductData, function(i, ele) {
+        html += "<li>" + ele.sku + " Qty: " + ele.qty + "</li>";
+    });
+    html += "</ul>";
+
+    if(productInfo.bulk_price_msg){
+    	if(productInfo.bulk_price_msg.length>0){
+        saveHtml += "<div class='ajc-bulk-title'>Buy More Save More</div>";
+        saveHtml += "<ul>";
+        $j.each(productInfo.bulk_price_msg, function(i, smsg) {
+            saveHtml += "<li>" + smsg + "</li>";
+        });
+        saveHtml += "</ul>";
+        }
+    }
+
+    if(simpleProductData.length){
+        fancyBoxContent = '<form id="ajax-cart-confirm" action="' + checkoutOPCUrl + '">' +
+        '<div class="ajc-confirm-success">' + successMsg + '</div>' +
+        //'<div class="ajc-confirm-descr">' + productInfo.description + '</div>' +
+        '<div class="ajc-simples-data">' + html + '</div>' +
+        '<div class="ajc-saving-data">' + saveHtml + '</div>' +
+        '<div class="button-wrapper"><button type="button" class="close-confirm button"><span>Continue Shopping</span></button>' +
+        '<button type="submit" class="button"><span>Go to Cart</span></button></div>' +
+        '</form>';
+    }else {
+        fancyBoxContent = '<form id="ajax-cart-confirm" action="' + checkoutOPCUrl + '">' +
+        '<div class="ajc-confirm-success">' + successMsg + '</div>' +
+        //'<div class="ajc-confirm-descr">' + productInfo.description + '</div>' +
+        '<div class="ajc-confirm-qty">' + productInfo.quantity + '</div>' +
+        '<div class="ajc-confirm-sku">SKU: ' + productInfo.sku + '</div>' +
+        '<div class="ajc-saving-data">' + saveHtml + '</div>' +
+        '<div class="button-wrapper"><button type="button" class="close-confirm button"><span>Continue Shopping</span></button>' +
+        '<button type="submit" class="button"><span>Go to Cart</span></button></div>' +
+        '</form>';
+    }
+
+    $j.fancybox.open({
+        content: fancyBoxContent,
+        fitToView : false,
+        width     : '38%',
+        height    : 'auto',
+        autoSize  : false,
+    });
+}
+
+
+function buildErrorBox(successMsg, productInfo){
+    var html = "";
+    var fancyBoxContent = "";
+
+    fancyBoxContent = '<form id="ajax-cart-confirm" action="' + checkoutOPCUrl + '">' +
+        '<div class="ajc-confirm-success">' + successMsg + '</div>' +
+            //'<div class="ajc-confirm-descr">' + productInfo.description + '</div>' +
+        '<div class="ajc-simples-data">' + html + '</div>' +
+        '<div class="button-wrapper"><button type="button" class="close-confirm button"><span>Continue Shopping</span></button>' +
+        '</form>';
+
+    $j.fancybox.open({
+        content: fancyBoxContent,
+        fitToView : false,
+        width     : '38%',
+        height    : 'auto',
+        autoSize  : false,
+    });
+}
+
+if(typeof Minicart !== "undefined") {
+    Minicart.prototype.updateContentOnRemove = Minicart.prototype.updateContentOnRemove.wrap(
+        function(parentFunction, result, el) {
+            parentFunction(result, el);
+            jQuery(document).trigger('yousavedx:update');
+        }
+    );
+}
+

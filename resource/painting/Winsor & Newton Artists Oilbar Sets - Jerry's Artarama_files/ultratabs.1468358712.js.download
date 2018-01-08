@@ -1,0 +1,81 @@
+/**
+ * Nwdthemes Ultratabs Extension
+ *
+ * @package     Ultratabs
+ * @author        Nwdthemes <mail@nwdthemes.com>
+ * @link        http://nwdthemes.com/
+ * @copyright   Copyright (c) 2014. Nwdthemes
+ * @license     http://themeforest.net/licenses/terms/regular
+ */
+
+(function(jQuery) {
+
+jQuery.fn.extend({
+    scrollToMe: function () {
+        jQuery('html,body').animate({scrollTop: (jQuery(this).offset().top - 100)}, 500);
+    }});
+
+
+jQuery(function($) {
+
+	enquire.register('screen and (min-width: 771px)', {
+		match: function () {
+			$('#ultratabs.ut_vertical div.content > div').css("min-height", $('#ultratabs ul.nav').height() + 20 + 'px');
+		},
+		unmatch: function () {
+			$('#ultratabs.ut_vertical div.content > div').css("min-height", "");
+		}
+	});
+
+	$('#ultratabs ul.nav li a').click(function() {
+		$(this).parent().click();
+		return false;
+	});
+
+	$('#ultratabs ul.nav li')
+		.click(function (event) {
+			event.preventDefault();
+			if ( $(this).hasClass('active') ) {
+				return;
+			}
+			var alias = $(this).data('alias');
+			$('#ultratabs div.content #ultratab_content_' + $('#ultratabs ul.nav li.active').data('alias')).hide();
+			$('#ultratabs div.content #ultratab_content_' + alias).fadeIn(256);
+			$('#ultratabs ul.nav li.active, #ultratabs .tab_drawer.active').removeClass('active');
+			$(this).addClass('active');
+			$('#ultratabs .tab_drawer[data-alias="' + alias + '"]').addClass('active');
+		})
+		.first().trigger('click');
+
+	$('#ultratabs .tab_drawer')
+		.click(function (event) {
+			event.preventDefault();
+			if ( $(this).hasClass('active') ) {
+				return;
+			}
+			var $this = $(this);
+			var alias = $this.data('alias');
+			$('#ultratabs div.content #ultratab_content_' + $('#ultratabs ul.nav li.active').data('alias')).slideUp();
+			$('#ultratabs div.content #ultratab_content_' + alias).slideDown(400, function () {
+				$('html, body').animate({
+					scrollTop: $this.offset().top - 40
+				}, 400);
+			});
+			$('#ultratabs ul.nav li.active, #ultratabs .tab_drawer.active').removeClass('active');
+			$this.addClass('active');
+			$('#ultratabs ul.nav li[data-alias="' + alias + '"]').addClass('active');
+		});
+
+    //add review link on product page open review tab
+    if ( $('#ultratabs ul.nav li[data-alias="review"]').length ) {
+        $('div.product-view p.no-rating a, div.product-view .rating-links a, .dedicated-review-box .title-container button').click(function () {
+            $('#ultratabs ul.nav li[data-alias="review"]').click();
+            $('#ultratab_content_review').scrollToMe();
+            return false;
+        });
+    }
+
+
+});
+
+})($nwd_jQuery);

@@ -1,0 +1,270 @@
+ //$j=jQuery.noConflict();
+
+//jQuery(function($j) { 
+	var producturl;
+	
+	function geturlrewrite(){
+		var mypath = arguments[0];
+		var patt = /\/[^\/]{0,}$/ig;
+		if(mypath){
+			if(mypath[mypath.length-1]=="/"){
+				mypath = mypath.substring(0,mypath.length-1);
+				return (mypath.match(patt)+"/");
+			}
+			return mypath.match(patt);
+		}
+		return '';	
+	}
+
+	function urltrim(){
+		return arguments[0].replace(/^\s+|\s+$/g,"");
+	}
+
+	function installquickview(){
+		if (typeof CMSMART == 'undefined') return;
+		if(jQuery(document).width()<=640) return ; /*disable on mobile*/
+		var argInput = arguments[0];
+
+		var productlistBlocks = $j(argInput.productlistClassArr); //li
+		var datasaved = [];
+		var mypath = 'cmsmquickview/index/index';
+		if(CMSMART.QuickView.BASE_URL.indexOf('index.php') == -1){
+			mypath = 'cmsmquickview/index/index';
+		}else{
+			mypath = 'cmsmquickview/index/index';
+		}
+		var baseUrl = CMSMART.QuickView.BASE_URL + mypath;
+		
+		var _quickviewbutton = '<a id="cmsmart_quickview_button" href="#">' + CMSMART.QuickView.BOTTON_LABEL + '</a>';
+		var _quickform = '<div id="csmm_quickform">' + 
+			'<div id = "quickviewshow" ></div>' + 
+		'</div>';
+
+		$j(document.body).append(_quickform);
+		$j(document.body).append(_quickviewbutton);
+
+		var quickviewButton = $j('#cmsmart_quickview_button');
+		//alert(encodeURIComponent(CMSMART.QuickView.BASE_URL + 'ab=3dfd&ddfdfd=234'));
+		$j.each(productlistBlocks, function(i, vl){
+		var productlist = $j(vl);
+		$j.each(productlist, function(index, value) {
+			var reloadurl = '';
+			
+			var aClass = argInput.aClass[i]?argInput.aClass[i]:argInput.aClass[0];
+			producturl = $j(aClass, value);
+			var ignore=producturl.attr("data-qv-ignore");
+			var product_id=producturl.attr("data-product-id");
+			if(!producturl.attr('href'))
+			{
+				producturl = $j('a', value);
+			}
+			var gotoBtn = $j('.product-info .item-info', value);
+			
+			if(producturl.attr('href') && !ignore){
+				var producturlpath = producturl.attr('href').replace(CMSMART.QuickView.BASE_URL,"");
+				//var producturlpath = geturlrewrite(producturl.attr('href'))[0];
+				//producturlpath[0] == "\/" ? producturlpath = producturlpath.substring(1,producturlpath.length) : producturlpath;
+				//producturlpath = urltrim(producturlpath);
+				if(product_id)
+				{
+					producturlpath=producturlpath+"/id/"+product_id;
+				}
+
+				reloadurl += baseUrl+ ("/path/"+producturlpath).replace(/\/\//g,"/");
+				//alert(reloadurl);
+				reloadurl=reloadurl.replace(new RegExp("https?://"),"//");
+				var imgClass = argInput.imgClass[i]?argInput.imgClass[i]:argInput.imgClass[0];
+				
+				$j(this).bind('mouseover', function() {
+					//var o = $j(this).offset();
+					//var o = $j(this);
+
+					var o = $j(imgClass+':eq(0)', this);
+					
+					if(o.length>0)
+					{
+					  $j('#cmsmart_quickview_button').attr('href',reloadurl).show()
+						.css({
+							'top': o.offset().top+(o.height() - quickviewButton.height())/2+'px',
+							'left': o.offset().left+(o.width() - quickviewButton.outerWidth())/2+'px',
+							'visibility': 'visible'
+						}).attr("data-current-product",product_id);
+					}
+				});
+				$j(value).bind('mouseout', function() {
+					
+					$j('#cmsmart_quickview_button').hide();
+				});
+			}
+		});
+		});
+
+		if(CMSMART.QuickView.CENTER)
+		{ 
+			$j("#quickviewshow").css('margin', ($j(window).height() / 2 - $j("#quickviewshow").height() / 2) + "px auto auto auto"); 
+		}
+			
+		$j('#cmsmart_quickview_button')
+			.bind('mouseover', function() {
+				$j(this).show();
+				var produtcId=$j(this).attr("data-current-product");
+				if(produtcId)
+				{
+					$j("#product-link-"+produtcId).addClass("show-btn")
+				}
+			})
+			$j('#cmsmart_quickview_button')
+			.bind('mouseout', function() {
+				var produtcId=$j(this).attr("data-current-product");
+				if(produtcId)
+				{
+					$j("#product-link-"+produtcId).removeClass("show-btn")
+				}
+			})
+			.bind('click', function() {
+				idbyurl = ($j(this).attr('href')).replace(/\W/g,"");
+				showqv();
+				$j("#quickviewshow").html('<a id="cmsmart_quickview_button_close" title="Close Quick View"> </a><a class="quickviewloading"><a>');
+				$j("#cmsmart_quickview_button_close").on( "click", function() {
+					closeqv();
+					$j("div.zoomContainer").remove();
+				});
+				
+				$j(this).hide();			
+				if(datasaved[idbyurl]){
+					$j("#quickviewshow").html('<a id="cmsmart_quickview_button_close" title="Close Quick View"> </a>');
+					$j("#cmsmart_quickview_button_close").on( "click", function() {
+						closeqv();
+					});
+					$j("#quickviewshow").append(datasaved[idbyurl]);				
+					showqv();				
+					relimg();
+					return false;				
+				}			
+				else{
+					$j.ajax({
+						url: $j(this).attr('href'),
+						cache: false
+					}).done(function( html ) {
+						
+						$j("#quickviewshow").html('<a id="cmsmart_quickview_button_close" title="Close Quick View"> </a>');
+						$j("#cmsmart_quickview_button_close").on( "click", function() {
+							closeqv();
+							$j("div.zoomContainer").remove();
+						});													
+						$j("#quickviewshow").append(html);					
+						showqv();						
+						datasaved[idbyurl] = html;
+						relimg();
+					});
+				}
+
+				return false;
+			});
+			
+			$j('#csmm_quickform').click(function(e) {
+				if($j(e.target).is('#quickviewshow, #quickviewshow *')) return;
+				$j('#csmm_quickform').hide();
+				$j("div.zoomContainer").remove();
+			});
+			
+	}
+
+	$j( document ).ready(function() {
+		installquickview(CMSMART.QuickView.BUTTON_CONFIG);
+	});
+	
+	$j(window).resize(function() {
+		$j("#quickviewshow").css('margin', ($j(window).height() / 2 - $j("#quickviewshow").height() / 2) + "px auto auto auto");
+	});
+	
+	
+	function relimg(){
+		maxh = $j('div.product-quickview').outerHeight() - 45;
+		if($j('div.qvtabhead')) maxh = maxh - $j('div.qvtabhead').outerHeight();
+		if($j('div.qvformaddtocart')) maxh = maxh - $j('div.qvformaddtocart').outerHeight();
+		if($j('div.tabquickshow')) $j('div.tabquickshow').css('max-height', maxh + "px");	
+		
+		//submitbqv();
+		$j('#showlargeimg').elevateZoom({ zoomWindowWidth:300, zoomWindowHeight:300, borderSize: 2, zoomWindowOffetx:15, cursor:'move' });
+		 $j('#mycarousel').jcarousel({
+			scroll: 4
+		});
+	
+		$j("li img.p_image_hover").click(
+			function () {
+				smallImage = $j(this).attr('src');
+				largeImage = $j(this).attr('data-zoom-image');
+				$j('img#showlargeimg').attr('src', smallImage);
+				var ez = $j('#showlargeimg').data('elevateZoom');
+				ez.swaptheimage(smallImage, largeImage);
+			}
+		);
+	
+		$j('a.tabquickviewcontrol').click(
+			function(){		
+				$j('a.tabquickviewcontrol').removeClass("highlight");
+				$j(this).addClass("highlight");
+				var divsl = $j(this).attr('href');
+				$j('.tabquickshow').css('display', 'none');
+				$j(divsl).css('display', 'block');
+				return false;
+			}
+		)
+	}
+	
+	function showqv(){ $j("#csmm_quickform").css("display", "block"); $j('body').addClass('menu-modal-open'); }
+	function closeqv(){ 
+		var len=$j('.quickviewcontent .product-videos').length;
+			
+			if(len>=1)
+			{	
+			  	var video=$j('.quickviewcontent .product-videos').find('li.active video');
+			  	 if(video.length)
+			  	 {
+					$j(video).trigger('pause');
+				 }
+			    var frame=$j('.quickviewcontent .product-videos').find('li.active iframe');
+			    
+					if(frame.length)
+			    	{
+			    		var url = frame.attr('src');
+						frame.attr('src', '');
+						frame.attr('src', url);
+			    	}
+			}
+
+		$j("#csmm_quickform").css("display", "none"); $j('body').removeClass('menu-modal-open');}
+	
+	function btcloseqv(){
+		$j("#cmsmart_quickview_button_close").on( "click", function() {
+			$j("#csmm_quickform").css("display", "none");
+			var len=$j('.quickviewcontent .product-videos').length;
+			if(len>=1)
+			{
+			  var video=$j('.quickviewcontent .product-videos').find('li.active video');
+			  	  $j(video).trigger('pause');
+			}
+		});
+	}
+	
+	function submitbqv(){
+		var fr = $j('#product_addtocart_form');
+		var btc = $j('.btn-cart', fr);
+		
+		btc.attr('onclick', '');
+		btc.click(function(){
+			var cansubmit = true;
+			$j('select.required-entry', fr).each(function(){
+				if($j(this).val() == ''){
+					$j(this).addClass('validation-failed');
+					$j(this).focus();
+					cansubmit = false;
+					return false;
+				}else { $j(this).removeClass('validation-failed'); }
+			});
+			if(cansubmit) fr.submit();
+		});
+	}
+	btcloseqv();
+//});
