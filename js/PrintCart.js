@@ -37,7 +37,7 @@ strVar += "			<\/tr>";
 function addEmpty(){
 	var bigCart=document.getElementById("biggy");	
 var strVar="";
-strVar += "<div style='text-align:center; padding:40px;'><a href=\"Home.html\"><img src=\"resource\/emptyCart.jpg\" width=\"400\" alt=\"\"\/><\/a></div>";
+strVar += "<div style='text-align:center; padding:40px;'><a href=\"index.html\"><img src=\"resource\/emptyCart.jpg\" width=\"400\" alt=\"\"\/><\/a></div>";
 strVar += "";
 	bigCart.innerHTML=strVar;	
 }

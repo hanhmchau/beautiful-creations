@@ -108,7 +108,7 @@ function FullProduct(id, name, price, image, type, subtype, pretitle, descriptio
 		strVar += "<\/div>";
 		strVar += "<div id=\"header\">";
 		strVar += "<!--	the logo\/brand name (click to go back to Homepage)-->";
-		strVar += "	<a id=\"back-to-home-logo\" href=\"Home.html\">";
+		strVar += "	<a id=\"back-to-home-logo\" href=\"index.html\">";
 		strVar += "		<img src=\"resource\/logo4.png\" id=\"logo\" height=\"75\" alt=\"\"\/><br>";
 		strVar += "	<\/a>";
 		strVar += "<\/div>";
